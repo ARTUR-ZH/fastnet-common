@@ -45,6 +45,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TConverter.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Fastnet.Common.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy $(TargetDir)\$(TargetFileName) C:\devroot\Binaries\$(ConfigurationName) /Y /F
