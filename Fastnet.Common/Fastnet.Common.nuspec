@@ -11,6 +11,12 @@
     <releaseNotes>First nuget version of this dll</releaseNotes>
     <copyright>Copyright 2015</copyright>
     <tags>Fastnet</tags>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Net.Http" targetFramework="net45" />
+      <frameworkAssembly assemblyName="System.Net.Http.Formatting" targetFramework="net45" />
+      <frameworkAssembly assemblyName="System.Web" targetFramework="net45" />
+      <frameworkAssembly assemblyName="System.Web.Http" targetFramework="net45" />
+    </frameworkAssemblies>
   </metadata>
   <files>
     <file src="bin\Debug\Fastnet.Common.pdb" target="lib\net45" />
