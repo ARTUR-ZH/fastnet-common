@@ -17,6 +17,9 @@
       <frameworkAssembly assemblyName="System.Web" targetFramework="net45" />
       <frameworkAssembly assemblyName="System.Web.Http" targetFramework="net45" />
     </frameworkAssemblies>
+    <dependencies>
+      <dependency  id="Newtonsoft.Json" version="6.0.8" ></dependency>
+    </dependencies>
   </metadata>
   <files>
     <file src="bin\Debug\Fastnet.Common.pdb" target="lib\net45" />
