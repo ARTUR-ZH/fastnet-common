@@ -27,9 +27,10 @@ namespace Fastnet.Web.Common
     }
     public class MessageHub : Hub
     {
+        private static bool traceConnections = ApplicationSettings.Key("MessageHub:TraceConnections", false);
         public static void Initialise()
         {
-            if (ApplicationSettings.Key("MessageHubTracing", false))
+            if (ApplicationSettings.Key("MessageHub:SendInformationMessages", false))
             {
                 Task.Run(async () =>
                 {
@@ -46,12 +47,20 @@ namespace Fastnet.Web.Common
         }
         public override Task OnConnected()
         {
-            Debug.Print("MessageHub: OnConnected - {0}", this.Context.ConnectionId);
+            if (traceConnections)
+            {
+                Log.Write("MessageHub::OnConnected() {0}", this.Context.ConnectionId);
+            }
+            //Debug.Print("MessageHub: OnConnected - {0}", this.Context.ConnectionId);
             return base.OnConnected();
         }
         public override Task OnDisconnected(bool stopCalled)
         {
-            Debug.Print("MessageHub: OnDisconnected - {0}", this.Context.ConnectionId);
+            if (traceConnections)
+            {
+                Log.Write("MessageHub::OnDisconnected() {0}", this.Context.ConnectionId);
+            }
+            //Debug.Print("MessageHub: OnDisconnected - {0}", this.Context.ConnectionId);
             if (HubRegister.Connections.ContainsKey(this.Context.ConnectionId))
             {
                 HubRegister.Connections.Remove(this.Context.ConnectionId);
@@ -60,7 +69,11 @@ namespace Fastnet.Web.Common
         }
         public override Task OnReconnected()
         {
-            Debug.Print("MessageHub: OnReconnected - {0}", this.Context.ConnectionId);
+            if (traceConnections)
+            {
+                Log.Write("MessageHub::OnReconnected() {0}", this.Context.ConnectionId);
+            }
+            //Debug.Print("MessageHub: OnReconnected - {0}", this.Context.ConnectionId);
             return base.OnReconnected();
         }
         public void Register(dynamic data)
@@ -71,7 +84,10 @@ namespace Fastnet.Web.Common
             HubRegister.ClientType ct = (HubRegister.ClientType)Enum.Parse(typeof(HubRegister.ClientType), clientType, true);
             var client = new HubRegister.HubClient { Name = name, ConnectionId = connectionId, ClientType = ct };
             HubRegister.Connections.Add(connectionId, client);
-            Debug.Print("Registered client {0}: {1}", connectionId, clientType);
+            if (traceConnections)
+            {
+                Log.Write("MessageHub::Register() client {0} registered: {1}, {2} [total now {3}]", connectionId, clientType, name, HubRegister.Connections.Count());
+            }
         }
     }
 }
