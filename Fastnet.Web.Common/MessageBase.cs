@@ -38,7 +38,7 @@ namespace Fastnet.Web.Common
         //    //Debug.Print("Sending {0} to {1} clients", (string)data.Ident, HubRegister.Connections.Count());
         //    htx.Clients.All.receiveMessage(data);
         //}
-        public static void Send(MessageBase data)
+        public static void Send(dynamic data)
         {            
             IHubContext htx = GlobalHost.ConnectionManager.GetHubContext<MessageHub>();
             if (traceMessages)

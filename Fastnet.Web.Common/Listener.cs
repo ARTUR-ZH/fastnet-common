@@ -65,23 +65,25 @@ namespace Fastnet.Web.Common
                     wrapper.InnerMessage = mhi;
                     wrapper.Send();
                 }
-                if (traceMessages)
-                {                    
-                    string connectionId = data.ConnectionId;
-                    int index = data.Index;
-                    string machine = data.Machine;
-                    switch (ident)
+                else
+                {
+                    if (traceMessages)
                     {
-                        case "MessageHubInformation":
-                            break;
-                        default:
-                            Log.Write("{0}[{1}] recd {2}({3}) from {4} ",
-                                  _listener.Name, connectionId, ident, index, machine);
-                            break;
-                    }
+                        string connectionId = data.ConnectionId;
+                        int index = data.Index;
+                        string machine = data.Machine;
+                        int processId = data.ProcessId;
+                        switch (ident)
+                        {
+                            default:
+                                Log.Write("connection {0} recd {1}({2}) from {3}:{4}",
+                                     connectionId, ident, index, machine, processId);
+                                break;
+                        }
 
+                    }
+                    onNotification(data);
                 }
-                onNotification(data);
             });
         }
         public IDisposable Add<T>(Action<T> onNotification)
