@@ -32,10 +32,12 @@ namespace Fastnet.Web.Common
         {
             if (ApplicationSettings.Key("MessageHub:SendInformationMessages", false))
             {
+                int interval = 2;
+                Log.Write("MessageHub: starting MessageHubInformation every {0} seconds", interval);
                 Task.Run(async () =>
                 {
                     //int count = 100;
-                    int delay = 2000;
+                    var delay = TimeSpan.FromSeconds(interval);
                     while (true)
                     {
                         await Task.Delay(delay);

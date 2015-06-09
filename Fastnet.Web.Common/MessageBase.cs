@@ -18,6 +18,7 @@ namespace Fastnet.Web.Common
         public int ProcessId { get; set; }
         public string Ident { get; private set; }
         public int Index { get; protected set; }
+        public string ConnectionId { get; set; }
 
         public MessageBase(int index)
         {
@@ -40,16 +41,26 @@ namespace Fastnet.Web.Common
         public static void Send(MessageBase data)
         {            
             IHubContext htx = GlobalHost.ConnectionManager.GetHubContext<MessageHub>();
-            //Debug.Print("Sending {0} to {1} clients", (string)data.Ident, HubRegister.Connections.Count());
-            htx.Clients.All.receiveMessage(data);
             if (traceMessages)
             {
-                Log.Write("MessageHub to {0} clients: {1}", HubRegister.Connections.Count(), data.ToString());
+                Log.Write("{0}", data.ToString());
             }
+            foreach (var connection in HubRegister.Connections)
+            {
+                data.ConnectionId = connection.Key;
+                htx.Clients.Client(connection.Key).receiveMessage(data);
+                if (traceMessages)
+                {
+                    Log.Write("\t>> {0} [{1} {2}]", connection.Key, connection.Value.ClientType, connection.Value.Name);
+                }
+            }
+            //Debug.Print("Sending {0} to {1} clients", (string)data.Ident, HubRegister.Connections.Count());
+            //htx.Clients.All.receiveMessage(data);
+
         }
         public override string ToString()
         {
-            return string.Format("Message {0}({1}) [{2}:{3}:{4}]", Ident, Index, Machine, ProcessId, AppDomainId);
+            return string.Format("{0}({1}) [{2}:{3}] >> {4}", Ident, Index, Machine, ProcessId, ConnectionId ?? "(id not set yet)");
         }
     }
     public class MessageHubInformation : MessageBase
@@ -75,7 +86,8 @@ namespace Fastnet.Web.Common
         }
         public override string ToString()
         {
-            return string.Format("{0}: Clients: {1} (total {2}){3}", base.ToString(), Clients, ClientTotal, InnerMessage != null ? " << " + InnerMessage.ToString() : "");
+            return string.Format("{0}{1}",
+                base.ToString(), InnerMessage != null ? " :: " + InnerMessage.ToString() : "");
         }
     }
 }
