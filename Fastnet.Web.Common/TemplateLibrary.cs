@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
 
-namespace Fastnet.Common
+namespace Fastnet.Web.Common
 {
     public class TemplateLibrary //: CustomFactory !! add this when customisinig for DWH
     {
