@@ -28,7 +28,7 @@ namespace Fastnet.Web.Common
             var r = await client.PostAsJsonAsync<T>(url, data);
             if (!r.IsSuccessStatusCode)
             {
-                Debug.Print("PostAsync() Error: destination: {0}, url: {1}", this.location, url);
+                //Debug.Print("PostAsync() Error: destination: {0}, url: {1}", this.location, url);
                 Log.Write("PostAsync() Error: destination: {0}, url: {1}", this.location, url);
             }
             r.EnsureSuccessStatusCode();
@@ -40,7 +40,7 @@ namespace Fastnet.Web.Common
             var r = await client.GetAsync(url);
             if (!r.IsSuccessStatusCode)
             {
-                Debug.Print("GetAsync() Error: destination: {0}, url: {1}", this.location, url);
+                //Debug.Print("GetAsync() Error: destination: {0}, url: {1}", this.location, url);
                 Log.Write("GetAsync() Error: destination: {0}, url: {1}", this.location, url);
             }
             r.EnsureSuccessStatusCode();

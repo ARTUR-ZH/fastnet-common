@@ -121,7 +121,7 @@ namespace Fastnet.Web.Common
             {
                 appName = templateFolder.Parent.Name.ToLower();
             }
-            Debug.Print("loading templates for {0}", appName);
+            //Debug.Print("loading templates for {0}", appName);
             findHtmlFiles(appName, templateFolder);
             var directories = templateFolder.EnumerateDirectories("*", System.IO.SearchOption.AllDirectories);
             foreach (System.IO.DirectoryInfo dir in directories)
