@@ -12,112 +12,6 @@ using System.Threading.Tasks;
 
 namespace Fastnet.Common
 {
-    //public static class Extensions
-    //{
-    //    public static string GetDescription(this Enum value)
-    //    {
-    //        Type type = value.GetType();
-    //        string name = Enum.GetName(type, value);
-    //        if (name != null)
-    //        {
-    //            FieldInfo field = type.GetField(name);
-    //            if (field != null)
-    //            {
-    //                DescriptionAttribute attr =
-    //                       Attribute.GetCustomAttribute(field,
-    //                         typeof(DescriptionAttribute)) as DescriptionAttribute;
-    //                if (attr != null)
-    //                {
-    //                    return attr.Description;
-    //                }
-    //            }
-    //        }
-    //        return name;
-    //    }
-    //    public static HttpResponseMessage CreateCacheableResponse<T>(this HttpRequestMessage request, HttpStatusCode code, T value)
-    //    {
-    //        double maxAge = ApplicationSettings.Key("Cache:MaxAge", 5.0); // in minutes
-    //        HttpResponseMessage response = request.CreateResponse(code, value);
-    //        CacheControlHeaderValue cchv = new CacheControlHeaderValue { Public = true, MaxAge = TimeSpan.FromMinutes(maxAge) };
-    //        response.Headers.CacheControl = cchv;
-    //        response.Headers.CacheControl = cchv;
-    //        return response;
-    //    }
-
-    //    public static HttpResponseMessage CreateCacheableResponse<T>(this HttpRequestMessage request, HttpStatusCode code, T value, DateTime lastModified, params object[] etagArgs)
-    //    {
-    //        HttpResponseMessage response = null;
-    //        string etag = CreateEtag(lastModified, etagArgs);
-    //        double maxAge = ApplicationSettings.Key("Cache:MaxAgeWithEtag", 0.0); // in minutes
-    //        if (IsModified(request, lastModified, etag))
-    //        {
-
-    //            response = request.CreateResponse(code, value);
-    //            response.Content.Headers.LastModified = lastModified;
-    //            //response.Headers.ETag = new EntityTagHeaderValue(etag);
-    //            //CacheControlHeaderValue cchv = new CacheControlHeaderValue { Public = true, MaxAge = TimeSpan.FromMinutes(maxAge) };
-    //            //response.Headers.CacheControl = cchv;
-    //            //return response;
-    //        }
-    //        else
-    //        {
-    //            response = request.CreateResponse(HttpStatusCode.NotModified);
-    //            //return response;
-    //        }
-    //        //response.Content.Headers.LastModified = lastModified;
-    //        response.Headers.ETag = new EntityTagHeaderValue(etag);
-    //        CacheControlHeaderValue cchv = new CacheControlHeaderValue { Public = true, MaxAge = TimeSpan.FromMinutes(maxAge) };
-    //        response.Headers.CacheControl = cchv;
-    //        return response;
-    //    }
-
-    //    public static HttpResponseMessage GetTemplate(this HttpRequestMessage request, string location, string name)
-    //    {
-    //        System.IO.FileInfo file;
-    //        var tl = TemplateLibrary.GetInstance();
-    //        string text = tl.GetTemplate(location, name, out file);
-    //        if (text != null)
-    //        {
-    //            return request.CreateCacheableResponse(HttpStatusCode.OK, new { Template = text }, file.LastWriteTime, file.FullName);
-    //        }
-    //        else
-    //        {
-    //            return request.CreateResponse(HttpStatusCode.NotFound);
-    //        }
-    //    }
-
-    //    private static string CreateEtag(DateTime modified, params object[] args)
-    //    {
-    //        string t = string.Format("{0:x}", modified.GetHashCode());// "";
-    //        foreach (object arg in args)
-    //        {
-    //            if (arg != null)
-    //            {
-    //                t += string.Format("{0:x}", arg.GetHashCode());
-    //            }
-    //        }
-    //        string etag = "\"" + t + "\"";
-    //        return etag;
-    //    }
-    //    public static bool IsModified(this HttpRequestMessage request, DateTime lastModified, params object[] args)
-    //    {
-    //        string etag = CreateEtag(lastModified, args);
-    //        return IsModified(request, lastModified, etag);
-    //    }
-    //    private static bool IsModified(this HttpRequestMessage request, DateTime modified, string etag)
-    //    {
-    //        var ifModifiedSince = request.Headers.IfModifiedSince;
-    //        var modifiedOn = DateTime.SpecifyKind(modified.ToUniversalTime(), DateTimeKind.Utc);
-    //        if (ifModifiedSince.HasValue == false || (modifiedOn - ifModifiedSince.Value) > TimeSpan.FromSeconds(1))
-    //        {
-    //            return true;
-    //        }
-    //        var ifNoneMatch = request.Headers.IfNoneMatch;
-    //        var temp = ifNoneMatch.FirstOrDefault();
-    //        string receivedTag = temp == null ? null : temp.Tag;
-    //        return etag != receivedTag;
-    //    }
-    //}
     public static class Extensions
     {
         public static T Set<T>(this Enum value, T flag) 
@@ -147,6 +41,36 @@ namespace Fastnet.Common
                 }
             }
             return name;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value">initial value</param>
+        /// <param name="existingValues">list of strings that cannot be used</param>
+        /// <param name="format">ensure that both {0} and {1} exist</param>
+        /// <returns></returns>
+        public static string MakeUnique(this string value, IEnumerable<string> existingValues, string format = "{0}{1}")
+        {
+            string fmt = value;// "New Group";
+            int count = 1;
+            bool finished = false;
+            string result = fmt;
+            do
+            {
+                if (!existingValues.Contains(result, StringComparer.InvariantCultureIgnoreCase))
+                {
+                    finished = true;
+                }
+                else
+                {
+                    result = string.Format(format, fmt, ++count);
+                }
+            } while (!finished);
+            return result;
+        }
+        public static dynamic ToJsonDynamic(this string value)
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(value);
         }
     }
 }

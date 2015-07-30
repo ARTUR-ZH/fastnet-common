@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fastnet.Common, Version=1.0.5660.20606, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fastnet.Common.1.0.5660.20606\lib\net45\Fastnet.Common.dll</HintPath>
+    <Reference Include="Fastnet.Common, Version=1.0.5689.18924, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fastnet.Common.1.0.5689.18924\lib\net45\Fastnet.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Fastnet.EventSystem.Logging, Version=3.2.5641.32231, Culture=neutral, processorArchitecture=MSIL">

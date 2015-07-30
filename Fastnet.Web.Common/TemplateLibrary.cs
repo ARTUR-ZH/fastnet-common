@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Fastnet.Common;
+using Fastnet.EventSystem;
+using Fastnet.Web.Common;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -12,13 +15,30 @@ namespace Fastnet.Web.Common
 {
     public class TemplateLibrary //: CustomFactory !! add this when customisinig for DWH
     {
+        private class TemplateFactory : CustomFactory
+        {
+            public string CustomTemplateFolder { get; private set; }
+            public bool HasCustomFolder { get; private set; }
+            public TemplateFactory()
+            {
+                CustomTemplateFolder = Settings.customTemplateFolder;
+                HasCustomFolder = CustomTemplateFolder != null;
+            }
+        }
         private class Templates
         {
             // key = template name, value fullpath
-            private Dictionary<string, string> dict = new Dictionary<string, string>();
+            internal Dictionary<string, string> dict = new Dictionary<string, string>();
             public void Add(string name, string path)
             {
-                dict.Add(name, path);
+                if (dict.ContainsKey(name))
+                {
+                    dict[name] = path;
+                }
+                else
+                {
+                    dict.Add(name, path);
+                }
             }
             public string Get(string name)
             {
@@ -29,22 +49,39 @@ namespace Fastnet.Web.Common
                 return null;
             }
         }
+        // key = location, value = list of templates
+        private Dictionary<string, Templates> templatesByLocation = new Dictionary<string, Templates>();
         public static void ScanForTemplates()
         {
-            var mainTemplateFolder = new System.IO.DirectoryInfo(HostingEnvironment.MapPath("~/Templates"));
-            if (System.IO.Directory.Exists(mainTemplateFolder.FullName))
+            Action<string> scan = (t) =>
             {
-                LoadTemplateInfo(mainTemplateFolder);
-            }
-            var areasDi = new System.IO.DirectoryInfo(HostingEnvironment.MapPath("~/Areas"));
-            foreach (System.IO.DirectoryInfo di in areasDi.GetDirectories())
-            {
-                //Debug.Print("area {0} found", di.Name);
-                var tf = System.IO.Path.Combine(di.FullName, "Templates");
-                if (System.IO.Directory.Exists(tf))
+                var mainTemplateFolder = new DirectoryInfo(HostingEnvironment.MapPath("~/" + t));
+                if (Directory.Exists(mainTemplateFolder.FullName))
                 {
-                    LoadTemplateInfo(new System.IO.DirectoryInfo(tf));
+                    // location starts with "main"
+                    LoadTemplateInfo(mainTemplateFolder);
                 }
+                var areasDi = new DirectoryInfo(HostingEnvironment.MapPath("~/Areas"));
+                if (areasDi.Exists)
+                {
+                    foreach (DirectoryInfo di in areasDi.GetDirectories())
+                    {
+                        //Debug.Print("area {0} found", di.Name);
+                        var tf = Path.Combine(di.FullName, t);
+                        if (Directory.Exists(tf))
+                        {
+                            LoadTemplateInfo(new System.IO.DirectoryInfo(tf));
+                        }
+                    }
+                }
+            };
+            scan("Templates");
+            LogTemplates();
+            TemplateFactory tfac = new TemplateFactory();
+            if (tfac.HasCustomFolder)
+            {
+                scan("CustomTemplates\\" + tfac.CustomTemplateFolder);
+                LogTemplates();
             }
         }
         public static TemplateLibrary GetInstance()
@@ -56,8 +93,6 @@ namespace Fastnet.Web.Common
             }
             return app.Get("template-library") as TemplateLibrary;
         }
-        // key = location, value = list of templates
-        private Dictionary<string, Templates> templatesByLocation = new Dictionary<string, Templates>();
         private TemplateLibrary()
         {
 
@@ -104,7 +139,7 @@ namespace Fastnet.Web.Common
                 return string.Empty;
             }
         }
-        private static void LoadTemplateInfo(System.IO.DirectoryInfo templateFolder)
+        private static void LoadTemplateInfo(DirectoryInfo templateFolder)
         {
             var templateLibrary = TemplateLibrary.GetInstance();
             Action<string, System.IO.DirectoryInfo> findHtmlFiles = (location, di) =>
@@ -130,6 +165,21 @@ namespace Fastnet.Web.Common
                 findHtmlFiles(location.Replace("\\", "-").ToLower(), dir);
             }
             //Application["td"] = templateLibrary;
+        }
+        private static void LogTemplates()
+        {
+            var templateLibrary = TemplateLibrary.GetInstance();
+            foreach (var entry in templateLibrary.templatesByLocation)
+            {
+                string location = entry.Key;
+                Templates templates = entry.Value;
+                foreach (var te in templates.dict)
+                {
+                    string name = te.Key;
+                    var template = te.Value;
+                    Log.Write("Template: location {0}, Name {1}, Template {2}", location, name, template);
+                }
+            }
         }
     }
 }
