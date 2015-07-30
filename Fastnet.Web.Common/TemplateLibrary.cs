@@ -76,12 +76,12 @@ namespace Fastnet.Web.Common
                 }
             };
             scan("Templates");
-            LogTemplates();
+            //LogTemplates();
             TemplateFactory tfac = new TemplateFactory();
             if (tfac.HasCustomFolder)
             {
                 scan("CustomTemplates\\" + tfac.CustomTemplateFolder);
-                LogTemplates();
+                //LogTemplates();
             }
         }
         public static TemplateLibrary GetInstance()
@@ -141,30 +141,49 @@ namespace Fastnet.Web.Common
         }
         private static void LoadTemplateInfo(DirectoryInfo templateFolder)
         {
-            var templateLibrary = TemplateLibrary.GetInstance();
-            Action<string, System.IO.DirectoryInfo> findHtmlFiles = (location, di) =>
+            try
             {
-                var files = di.EnumerateFiles("*.html");
-                foreach (System.IO.FileInfo file in files)
+                var templateLibrary = TemplateLibrary.GetInstance();
+                Action<string, System.IO.DirectoryInfo> findHtmlFiles = (location, di) =>
                 {
+                    var files = di.EnumerateFiles("*.html");
+                    foreach (System.IO.FileInfo file in files)
+                    {
                     //Debug.Print("Add location {0}, file {1}", location, System.IO.Path.GetFileNameWithoutExtension(file.Name));
                     templateLibrary.AddTemplate(location, System.IO.Path.GetFileNameWithoutExtension(file.Name), file.FullName);
+                    }
+                };
+                string[] tfParts = templateFolder.FullName.Split('\\');
+                string appName = "main";
+                if(tfParts.Contains("Areas"))
+                {
+                    appName = tfParts.SkipWhile(x => x != "Areas").Skip(1).First().ToLower();
                 }
-            };
-            string appName = "main";
-            if (string.Compare(templateFolder.Parent.Parent.Name, "Areas", true) == 0)
-            {
-                appName = templateFolder.Parent.Name.ToLower();
+                //if (string.Compare(templateFolder.Parent.Parent.Name, "Areas", true) == 0)
+                //{
+                //    appName = templateFolder.Parent.Name.ToLower();
+                //}
+                
+                findHtmlFiles(appName, templateFolder);
+                var directories = templateFolder.EnumerateDirectories("*", System.IO.SearchOption.AllDirectories);
+                foreach (System.IO.DirectoryInfo dir in directories)
+                {
+                    string[] dirParts = dir.FullName.Split('\\');
+                    string temp = string.Join("-", dirParts.Skip(tfParts.Length).ToArray()).ToLower();
+                    string location = string.Format("{0}-{1}", appName, temp);
+                    //string location = appName + "-" + dir.FullName.Substring(dir.FullName.ToLower().IndexOf("templates\\") + 10);
+                    //location = location.Replace("\\", "-").ToLower();
+                    //Debug.Print("Old: {0}, new: {1}", location, location2);
+                    findHtmlFiles(location, dir);
+                }
             }
-            //Debug.Print("loading templates for {0}", appName);
-            findHtmlFiles(appName, templateFolder);
-            var directories = templateFolder.EnumerateDirectories("*", System.IO.SearchOption.AllDirectories);
-            foreach (System.IO.DirectoryInfo dir in directories)
+            catch (Exception xe)
             {
-                string location = appName + "-" + dir.FullName.Substring(dir.FullName.ToLower().IndexOf("templates\\") + 10);
-                findHtmlFiles(location.Replace("\\", "-").ToLower(), dir);
+                Log.Write(xe);
+                //Debugger.Break();
+                throw;
             }
-            //Application["td"] = templateLibrary;
+
         }
         private static void LogTemplates()
         {
@@ -177,7 +196,7 @@ namespace Fastnet.Web.Common
                 {
                     string name = te.Key;
                     var template = te.Value;
-                    Log.Write("Template: location {0}, Name {1}, Template {2}", location, name, template);
+                    Debug.Print("Template: location {0}, Name {1}, Template {2}", location, name, template);
                 }
             }
         }
