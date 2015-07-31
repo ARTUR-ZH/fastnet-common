@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Hosting;
+using System.IO;
 using Fastnet.Common;
 
 namespace Fastnet.Web.Common
@@ -21,14 +22,27 @@ namespace Fastnet.Web.Common
         {
             //string setting = ApplicationSettings.Key("Customisation:Factory", "None");
             Settings = GetSettings();
-            string factory = Settings.factory ?? "None";
-            FactoryName = (FactoryName)Enum.Parse(typeof(FactoryName), factory, true);
+            if (Settings != null)
+            {
+                string factory = Settings.factory ?? "None";
+                FactoryName = (FactoryName)Enum.Parse(typeof(FactoryName), factory, true);
+            } else
+            {
+                FactoryName = FactoryName.None;
+            }
         }
         private dynamic GetSettings()
         {
             var customisationFile = HostingEnvironment.MapPath("~/customisation.json");
-            string text = System.IO.File.ReadAllText(customisationFile);
-            return text.ToJsonDynamic();
+            if (File.Exists(customisationFile))
+            {
+                string text = File.ReadAllText(customisationFile);
+                return text.ToJsonDynamic();
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 

@@ -21,8 +21,15 @@ namespace Fastnet.Web.Common
             public bool HasCustomFolder { get; private set; }
             public TemplateFactory()
             {
-                CustomTemplateFolder = Settings.templateFolder;
-                HasCustomFolder = CustomTemplateFolder != null;
+                if (FactoryName != FactoryName.None)
+                {
+                    CustomTemplateFolder = Settings.templateFolder;
+                    HasCustomFolder = CustomTemplateFolder != null;
+                }
+                else
+                {
+                    HasCustomFolder = false;
+                }
             }
         }
         private class Templates
