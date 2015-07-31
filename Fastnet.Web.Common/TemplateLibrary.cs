@@ -21,7 +21,7 @@ namespace Fastnet.Web.Common
             public bool HasCustomFolder { get; private set; }
             public TemplateFactory()
             {
-                CustomTemplateFolder = Settings.customTemplateFolder;
+                CustomTemplateFolder = Settings.templateFolder;
                 HasCustomFolder = CustomTemplateFolder != null;
             }
         }
