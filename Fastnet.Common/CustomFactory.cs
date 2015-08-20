@@ -16,22 +16,35 @@ namespace Fastnet.Web.Common
     }
     public abstract class CustomFactory
     {
-        public FactoryName FactoryName { get; private set; }
-        public dynamic Settings { get; set; }
-        public CustomFactory()
+        public static FactoryName FactoryName { get; private set; }
+        public static dynamic Settings { get; set; }
+        static CustomFactory()
         {
-            //string setting = ApplicationSettings.Key("Customisation:Factory", "None");
             Settings = GetSettings();
             if (Settings != null)
             {
                 string factory = Settings.factory ?? "None";
                 FactoryName = (FactoryName)Enum.Parse(typeof(FactoryName), factory, true);
-            } else
+            }
+            else
             {
                 FactoryName = FactoryName.None;
             }
         }
-        private dynamic GetSettings()
+        public CustomFactory()
+        {
+            ////string setting = ApplicationSettings.Key("Customisation:Factory", "None");
+            //Settings = GetSettings();
+            //if (Settings != null)
+            //{
+            //    string factory = Settings.factory ?? "None";
+            //    FactoryName = (FactoryName)Enum.Parse(typeof(FactoryName), factory, true);
+            //} else
+            //{
+            //    FactoryName = FactoryName.None;
+            //}
+        }
+        private static dynamic GetSettings()
         {
             var customisationFile = HostingEnvironment.MapPath("~/customisation.json");
             if (File.Exists(customisationFile))

@@ -1,10 +1,5 @@
-﻿using Fastnet.EventSystem;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Fastnet.Web.Common
@@ -26,11 +21,11 @@ namespace Fastnet.Web.Common
         {
             url = this.location + "/" + url;
             var r = await client.PostAsJsonAsync<T>(url, data);
-            if (!r.IsSuccessStatusCode)
-            {
-                //Debug.Print("PostAsync() Error: destination: {0}, url: {1}", this.location, url);
-                Log.Write("PostAsync() Error: destination: {0}, url: {1}", this.location, url);
-            }
+            //if (!r.IsSuccessStatusCode)
+            //{
+            //    //Debug.Print("PostAsync() Error: destination: {0}, url: {1}", this.location, url);
+            //    Log.Write("PostAsync() Error: destination: {0}, url: {1}", this.location, url);
+            //}
             r.EnsureSuccessStatusCode();
             return await r.Content.ReadAsAsync<dynamic>();
         }
@@ -38,11 +33,11 @@ namespace Fastnet.Web.Common
         {
             url = this.location + "/" + url;
             var r = await client.GetAsync(url);
-            if (!r.IsSuccessStatusCode)
-            {
-                //Debug.Print("GetAsync() Error: destination: {0}, url: {1}", this.location, url);
-                Log.Write("GetAsync() Error: destination: {0}, url: {1}", this.location, url);
-            }
+            //if (!r.IsSuccessStatusCode)
+            //{
+            //    //Debug.Print("GetAsync() Error: destination: {0}, url: {1}", this.location, url);
+            //    Log.Write("GetAsync() Error: destination: {0}, url: {1}", this.location, url);
+            //}
             r.EnsureSuccessStatusCode();
             return await r.Content.ReadAsAsync<dynamic>();
         }
