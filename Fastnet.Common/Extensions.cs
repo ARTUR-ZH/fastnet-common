@@ -72,5 +72,9 @@ namespace Fastnet.Common
         {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(value);
         }
+        public static string ToDefault(this DateTime d)
+        {
+            return d.ToString("ddMMMyyyy");
+        }
     }
 }
