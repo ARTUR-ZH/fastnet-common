@@ -46,16 +46,17 @@ namespace Fastnet.Web.Common
         }
         private static dynamic GetSettings()
         {
-            var customisationFile = HostingEnvironment.MapPath("~/customisation.json");
-            if (File.Exists(customisationFile))
+            var customisationSettingsFile = ApplicationSettings.Key<string>("Customisation:Settings", null);
+            if (customisationSettingsFile != null)
             {
-                string text = File.ReadAllText(customisationFile);
-                return text.ToJsonDynamic();
+                var customisationFile = HostingEnvironment.MapPath(string.Format("~/{0}", customisationSettingsFile));// "~/customisation.json");
+                if (File.Exists(customisationFile))
+                {
+                    string text = File.ReadAllText(customisationFile);
+                    return text.ToJsonDynamic();
+                }
             }
-            else
-            {
-                return null;
-            }
+            return null;
         }
     }
 
