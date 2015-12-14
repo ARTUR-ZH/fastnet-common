@@ -14,26 +14,34 @@ namespace Fastnet.Common
         [JsonIgnore]
         private string PropertyFile { get; set; }
         [JsonIgnore]
-        private bool loading = true;
+        private static bool _loading;// = true;
         protected static T Load<T>(string filename) where T : ApplicationProperties, new()
         {
             // ApplicationProperties instance = null;
-            if (File.Exists(filename))
+            _loading = true;
+            try
             {
-                string text = File.ReadAllText(filename);
-                _instance = JsonConvert.DeserializeObject<T>(text);
-            }
-            else
-            {
-                string folder = Path.GetDirectoryName(filename);
-                if (!Directory.Exists(folder))
+                if (File.Exists(filename))
                 {
-                    Directory.CreateDirectory(folder);
+                    string text = File.ReadAllText(filename);
+                    _instance = JsonConvert.DeserializeObject<T>(text);
                 }
-                _instance = new T();
+                else
+                {
+                    string folder = Path.GetDirectoryName(filename);
+                    if (!Directory.Exists(folder))
+                    {
+                        Directory.CreateDirectory(folder);
+                    }
+                    _instance = new T();
+                }
+                _instance.PropertyFile = filename;
+                _instance.loading = false;
             }
-            _instance.PropertyFile = filename;
-            _instance.loading = false;
+            finally
+            {
+                _loading = false;
+            }
             return (T)_instance;
         }
         public ApplicationProperties()
@@ -41,6 +49,7 @@ namespace Fastnet.Common
 
 
         }
+        protected bool loading { get { return _loading; }  set { _loading = value; } }
         protected override void OnPropertyChanged(string propertyName)
         {
             base.OnPropertyChanged(propertyName);
