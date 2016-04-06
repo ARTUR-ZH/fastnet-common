@@ -32,8 +32,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Fastnet.EventSystem.Logging, Version=3.2.5641.32231, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Fastnet.EventSystem.Logging.3.2.5641.32231\lib\net45\Fastnet.EventSystem.Logging.dll</HintPath>
+    <Reference Include="Fastnet.Common, Version=1.0.5715.25059, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fastnet.Common.1.0.5715.25059\lib\net45\Fastnet.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Fastnet.EventSystem.Logging, Version=3.2.5847.37148, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Fastnet.EventSystem.Logging.3.2.5847.37148\lib\net45\Fastnet.EventSystem.Logging.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="log4net, Version=1.2.13.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -92,7 +96,10 @@
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.Mvc, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.Mvc.5.2.3\lib\net45\System.Web.Mvc.dll</HintPath>
       <Private>True</Private>
@@ -134,12 +141,14 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="_CreateNewNuGetPackage\Config.ps1" />
+    <None Include="_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1" />
+    <None Include="_CreateNewNuGetPackage\DoNotModify\New-NuGetPackage.ps1" />
+    <None Include="_CreateNewNuGetPackage\DoNotModify\UploadNuGetPackage.ps1" />
+    <None Include="_CreateNewNuGetPackage\RunMeToUploadNuGetPackage.cmd" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Fastnet.Common\Fastnet.Common.csproj">
-      <Project>{f76d83db-d795-4e19-9036-13c15c44a028}</Project>
-      <Name>Fastnet.Common</Name>
-    </ProjectReference>
+    <None Include="_CreateNewNuGetPackage\DoNotModify\NuGet.exe" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
@@ -149,6 +158,12 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>REM Create a NuGet package for this project and place the .nupkg file in the project's output directory.
+REM If you see this in Visual Studio's Error List window, check the Output window's Build tab for the actual error.
+ECHO Creating NuGet package in Post-Build event...
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "&amp; '$(ProjectDir)_CreateNewNuGetPackage\DoNotModify\CreateNuGetPackage.ps1' -ProjectFilePath '$(ProjectPath)' -OutputDirectory '$(TargetDir)' -BuildConfiguration '$(ConfigurationName)' -BuildPlatform '$(PlatformName)'"</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
